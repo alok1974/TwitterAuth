@@ -129,8 +129,7 @@ namespace Twitter
             dummmy[0] = 0;
 
             // HTTP header
-            Dictionary<string, string> headers = new Dictionary<string, string>();
-
+            var headers = new Hashtable();
             Dictionary<string, string> parameters = new Dictionary<string, string>();
             AddDefaultOAuthParams(parameters, consumerKey, consumerSecret);
             parameters.Add("oauth_callback", "oob");
@@ -147,8 +146,7 @@ namespace Twitter
             dummmy[0] = 0;
 
             // HTTP header
-            Dictionary<string, string> headers = new Dictionary<string, string>();
-
+            var headers = new Hashtable();
             Dictionary<string, string> parameters = new Dictionary<string, string>();
             AddDefaultOAuthParams(parameters, consumerKey, consumerSecret);
             parameters.Add("oauth_token", requestToken);
@@ -195,7 +193,7 @@ namespace Twitter
                 dummmy[0] = 0;
 
                 // HTTP header
-                Dictionary<string, string> headers = new Dictionary<string, string>();
+                var headers = new Hashtable();
                 headers["Authorization"] = GetHeaderWithAccessToken("POST", url, consumerKey, consumerSecret, response, parameters);
                 
                 Debug.Log(string.Format("PostTweet Url {0}", url));
