@@ -43,8 +43,8 @@ namespace Twitter
         // Accss-Token will be always valid until the user revokes the access to your application.
 
         // Twitter APIs for OAuth process
-        private static readonly string RequestTokenURL = "https://api.twitter.com/oauth/request_token?oauth_callback=oob";
-        private static readonly string AuthorizationURL = "https://api.twitter.com/oauth/authorize?oauth_token={0}";
+        private static readonly string RequestTokenURL = "https://api.twitter.com/oauth/request_token";
+        private static readonly string AuthorizationURL = "https://api.twitter.com/oauth/authenticate?oauth_token={0}";
         private static readonly string AccessTokenURL = "https://api.twitter.com/oauth/access_token";
 
         public static IEnumerator GetRequestToken(string consumerKey, string consumerSecret, RequestTokenCallback callback)
@@ -124,19 +124,19 @@ namespace Twitter
 
         private static WWW WWWRequestToken(string consumerKey, string consumerSecret)
         {
-            // Need to fill body since Unity doesn't like an empty request body.
-            byte[] dummmy = new byte[1];
-            dummmy[0] = 0;
+            // Add data to the form to post.
+            WWWForm form = new WWWForm();
+            form.AddField("oauth_callback", "oob");
 
             // HTTP header
-            var headers = new Hashtable();
             Dictionary<string, string> parameters = new Dictionary<string, string>();
             AddDefaultOAuthParams(parameters, consumerKey, consumerSecret);
             parameters.Add("oauth_callback", "oob");
 
+            var headers = new Hashtable();
             headers["Authorization"] = GetFinalOAuthHeader("POST", RequestTokenURL, parameters);
 
-            return new WWW(RequestTokenURL, dummmy, headers);
+            return new WWW(RequestTokenURL, form.data, headers);
         }
 
         private static WWW WWWAccessToken(string consumerKey, string consumerSecret, string requestToken, string pin)
@@ -171,7 +171,7 @@ namespace Twitter
 
         #region Twitter API Methods
 
-        private static readonly string PostTweetURL = "https://api.twitter.com/1.1/statuses/update.json?status={0}";
+        private const string PostTweetURL = "https://api.twitter.com/1.1/statuses/update.json";
 
         public static IEnumerator PostTweet(string text, string consumerKey, string consumerSecret, AccessTokenResponse response, PostTweetCallback callback)
         {
@@ -183,22 +183,18 @@ namespace Twitter
             }
             else
             {
-                string url = string.Format(PostTweetURL, UrlEncode(text));
                 Dictionary<string, string> parameters = new Dictionary<string, string>();
-
                 parameters.Add("status", text);
-
-                // Need to fill body since Unity doesn't like an empty request body.
-                byte[] dummmy = new byte[1];
-                dummmy[0] = 0;
-
+                
+                // Add data to the form to post.
+                WWWForm form = new WWWForm();
+                form.AddField("status", text);
+                
                 // HTTP header
                 var headers = new Hashtable();
-                headers["Authorization"] = GetHeaderWithAccessToken("POST", url, consumerKey, consumerSecret, response, parameters);
-                
-                Debug.Log(string.Format("PostTweet Url {0}", url));
+                headers["Authorization"] = GetHeaderWithAccessToken("POST", PostTweetURL, consumerKey, consumerSecret, response, parameters);
 
-                WWW web = new WWW(url, dummmy, headers);
+                WWW web = new WWW(PostTweetURL, form.data, headers);
                 yield return web;
 
                 if (!string.IsNullOrEmpty(web.error))

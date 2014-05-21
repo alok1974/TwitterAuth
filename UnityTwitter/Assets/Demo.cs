@@ -77,7 +77,6 @@ public class Demo : MonoBehaviour
             {
                 text = m_AccessTokenResponse.ScreenName + "\nClick to register with a different Twitter account";
             }
-
             else
             {
                 text = "You need to register your game or application first.";
